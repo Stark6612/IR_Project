@@ -198,7 +198,7 @@ async def update_noise_config(req: NoiseRequest):
 @app.post("/api/obstacle")
 async def toggle_obstacle(req: ObstacleRequest):
     coord = Coordinate(req.x, req.y)
-    cell = world.get_cell(coord)
+    cell = controller.world.get_cell(coord)
     if not cell:
         return {"error": "Out of bounds"}
 
@@ -208,10 +208,34 @@ async def toggle_obstacle(req: ObstacleRequest):
     elif cell.entity_type == EntityType.EMPTY and coord != controller.rover.coordinate:
         cell.entity_type = EntityType.OBSTACLE
         action = "placed"
+        # If the newly placed obstacle blocks the rover's current planned path, trigger dynamic replanning
+        if coord in controller.rover.planned_path:
+            controller.rover.previous_path = list(controller.rover.planned_path)
+            controller.rover.blocked_obstacle = coord
+            if controller.current_task:
+                blocked_coords = controller.world.get_blocked_coordinates()
+                replan_res = controller.planner.plan(
+                    start=controller.rover.coordinate,
+                    goal=controller.current_task.target,
+                    blocked=blocked_coords,
+                )
+                if replan_res.success and replan_res.path:
+                    controller.rover.planned_path = replan_res.path
+                    controller.path_index = 0
+                    controller.rover.state = RobotState.MOVING
+                    controller.replans_count += 1
+                    controller.obstacles_encountered_count += 1
+                    controller.executor.log_event(
+                        event_type="navigation",
+                        target=controller.current_task.target,
+                        action="replan_path",
+                        outcome="SUCCESS",
+                        details={"new_path_length": len(replan_res.path), "reason": "dynamic_obstacle_placed"},
+                    )
     else:
         return {"error": "Cannot place obstacle on occupied cell"}
 
-    # If rover was moving and dynamic obstacle was placed, trigger proximity check on next step
+    # Broadcast updated state with both old and new paths
     await broadcast_state()
     return {"action": action, "coordinate": (req.x, req.y)}
 

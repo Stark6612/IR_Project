@@ -116,6 +116,8 @@ export const App: React.FC = () => {
             roverHeading={telemetry.rover.heading}
             currentTarget={telemetry.rover.current_target}
             plannedPath={telemetry.rover.planned_path}
+            previousPath={telemetry.rover.previous_path}
+            blockedObstacle={telemetry.rover.blocked_obstacle}
             proximityTriggered={telemetry.rover.proximity_cm < 15.0}
             onCellClick={handleCellClick}
             onCellInspect={handleCellInspect}

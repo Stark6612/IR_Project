@@ -131,6 +131,8 @@ export interface SimulationTelemetry {
     proximity_cm: number;
     current_target: [number, number] | null;
     planned_path: [number, number][];
+    previous_path?: [number, number][] | null;
+    blocked_obstacle?: [number, number] | null;
   };
   kinematics?: KinematicsData;
   cv_inspection?: CVInspectionData | null;

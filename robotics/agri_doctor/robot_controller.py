@@ -263,6 +263,8 @@ class RobotController:
                     self.obstacles_encountered_count += 1
                     self.replans_count += 1
                     self.rover.state = RobotState.AVOIDING_OBSTACLE
+                    self.rover.previous_path = list(self.rover.planned_path)
+                    self.rover.blocked_obstacle = next_cell
                     self.executor.log_event(
                         event_type="sensor_trigger",
                         target=next_cell,
@@ -323,6 +325,8 @@ class RobotController:
             )
 
             if replan_res.success and replan_res.path:
+                if not self.rover.previous_path:
+                    self.rover.previous_path = list(self.rover.planned_path)
                 self.rover.planned_path = replan_res.path
                 self.path_index = 0
                 self.rover.state = RobotState.MOVING
@@ -402,6 +406,8 @@ class RobotController:
                 "proximity_cm": round(self.rover.proximity_cm, 1),
                 "current_target": self.rover.current_target.to_tuple() if self.rover.current_target else None,
                 "planned_path": [c.to_tuple() for c in self.rover.planned_path],
+                "previous_path": [c.to_tuple() for c in self.rover.previous_path] if self.rover.previous_path else None,
+                "blocked_obstacle": self.rover.blocked_obstacle.to_tuple() if self.rover.blocked_obstacle else None,
             },
             "kinematics": {
                 "pose_meters": {

@@ -31,6 +31,8 @@ export class ClientSimulationEngine {
   proximityCm = 100.0;
   currentTarget: Coord | null = null;
   plannedPath: Coord[] = [];
+  previousPath: Coord[] | null = null;
+  blockedObstacle: Coord | null = null;
   pathIndex = 0;
 
   // Kinematics & PID
@@ -135,6 +137,8 @@ export class ClientSimulationEngine {
     this.proximityCm = 100.0;
     this.currentTarget = null;
     this.plannedPath = [];
+    this.previousPath = null;
+    this.blockedObstacle = null;
     this.pathIndex = 0;
     this.visitedCells = new Set([this.key(0, 0)]);
     this.weedsCleared = 0;
@@ -420,6 +424,8 @@ export class ClientSimulationEngine {
           this.obstaclesEncountered++;
           this.replansCount++;
           this.roverState = 'AVOIDING_OBSTACLE';
+          this.previousPath = [...this.plannedPath];
+          this.blockedObstacle = { x: next.x, y: next.y };
           this.logEvent('sensor_trigger', [next.x, next.y], 'proximity_detect', 'OBSTACLE_AVOIDANCE', {
             proximity_cm: this.proximityCm,
             message: `Obstacle encountered ahead at (${next.x}, ${next.y})!`,
@@ -454,6 +460,9 @@ export class ClientSimulationEngine {
       if (this.currentTarget) {
         const replan = this.planAStar(this.roverCoord, this.currentTarget);
         if (replan.length > 0) {
+          if (!this.previousPath) {
+            this.previousPath = [...this.plannedPath];
+          }
           this.plannedPath = replan;
           this.pathIndex = 0;
           this.roverState = 'MOVING';
@@ -518,6 +527,26 @@ export class ClientSimulationEngine {
       return true;
     } else if (cell.entity_type === 'empty' && !(x === this.roverCoord.x && y === this.roverCoord.y)) {
       cell.entity_type = 'obstacle';
+      // If dynamic obstacle blocks current path, preserve old path and replan immediately
+      const blocks = this.plannedPath.some(p => p.x === x && p.y === y);
+      if (blocks) {
+        this.previousPath = [...this.plannedPath];
+        this.blockedObstacle = { x, y };
+        if (this.currentTarget) {
+          const replan = this.planAStar(this.roverCoord, this.currentTarget);
+          if (replan.length > 0) {
+            this.plannedPath = replan;
+            this.pathIndex = 0;
+            this.roverState = 'MOVING';
+            this.replansCount++;
+            this.obstaclesEncountered++;
+            this.logEvent('navigation', [this.currentTarget.x, this.currentTarget.y], 'replan_path', 'SUCCESS', {
+              new_path_length: replan.length,
+              reason: 'dynamic_obstacle_placed',
+            });
+          }
+        }
+      }
       return true;
     }
     return false;
@@ -547,6 +576,8 @@ export class ClientSimulationEngine {
         proximity_cm: Number(this.proximityCm.toFixed(1)),
         current_target: this.currentTarget ? [this.currentTarget.x, this.currentTarget.y] : null,
         planned_path: this.plannedPath.map(p => [p.x, p.y]),
+        previous_path: this.previousPath ? this.previousPath.map(p => [p.x, p.y]) : null,
+        blocked_obstacle: this.blockedObstacle ? [this.blockedObstacle.x, this.blockedObstacle.y] : null,
       },
       kinematics: {
         pose_meters: {

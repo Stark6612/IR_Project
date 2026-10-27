@@ -98,6 +98,8 @@ class RoverState:
     proximity_cm: float = 100.0  # Simulated distance in cm
     current_target: Optional[Coordinate] = None
     planned_path: List[Coordinate] = field(default_factory=list)
+    previous_path: Optional[List[Coordinate]] = None
+    blocked_obstacle: Optional[Coordinate] = None
 
 
 @dataclass
