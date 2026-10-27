@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg-primary: #070c09;
+  --bg-secondary: #0d1712;
+  --bg-card: rgba(18, 28, 22, 0.85);
+  --bg-card-hover: rgba(24, 38, 30, 0.95);
+  --border-subtle: rgba(52, 211, 153, 0.15);
+  --border-glow: rgba(52, 211, 153, 0.4);
+  
+  --emerald-primary: #10b981;
+  --emerald-light: #34d399;
+  --emerald-glow: rgba(16, 185, 129, 0.35);
+  
+  --amber-warning: #f59e0b;
+  --amber-glow: rgba(245, 158, 11, 0.3);
+  
+  --crimson-danger: #ef4444;
+  --cyan-accent: #06b6d4;
+  --indigo-accent: #6366f1;
+
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 15% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(6, 182, 212, 0.06) 0%, transparent 45%),
+    linear-gradient(to bottom, #070c09 0%, #0a130f 100%);
+  background-attachment: fixed;
+}
+
+/* Glass Card Utility */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+/* Glowing Accent Border */
+.glow-emerald {
+  box-shadow: 0 0 20px var(--emerald-glow);
+}
+
+/* Monospace Badges */
+.mono-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.25);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.45);
+}
+
+/* Pulse animation for active robot / target */
+@keyframes targetPulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+.animate-target-pulse {
+  animation: targetPulse 1.8s infinite ease-in-out;
+}
+
+/* Trajectory Line Dashes */
+@keyframes pathFlow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.path-line-flowing {
+  stroke-dasharray: 6 4;
+  animation: pathFlow 1.2s linear infinite;
+}
+
+/* Directional Arrow Pulse */
+@keyframes roverGlow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6)); }
+  50% { filter: drop-shadow(0 0 14px rgba(52, 211, 153, 0.9)); }
+}
+
+.rover-beacon {
+  animation: roverGlow 2s infinite ease-in-out;
+}

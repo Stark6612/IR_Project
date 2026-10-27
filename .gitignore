@@ -1,0 +1,65 @@
+# Node / Frontend
+node_modules/
+dashboard/node_modules/
+dashboard/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Caches
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+ENV/
+.env
+
+# Temporary / Scratch
+scratch/
+.system_generated/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+*.log
+
+# Academic Report, PDFs & Planning Documents
+*.pdf
+generate_report_pdf.py
+Agri-Doctor-Robot-Implementation-Plan.md
+Agri-Doctor-Robot-Windows-PRD.md
+evaluation-metrics.md
+report-screenshot-guide.md
+report-source-code-snippets.md
+docs/
+screenshots/
+scripts/capture_report_screenshots.py
