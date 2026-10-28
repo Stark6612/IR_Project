@@ -63,3 +63,7 @@ report-source-code-snippets.md
 docs/
 screenshots/
 scripts/capture_report_screenshots.py
+
+# YOLO temporary run outputs
+runs/
+yolov8n.pt

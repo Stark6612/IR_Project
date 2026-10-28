@@ -20,8 +20,8 @@ interface Coord {
 }
 
 export class ClientSimulationEngine {
-  width = 6;
-  height = 4;
+  width = 8;
+  height = 6;
   scenarioName = 'mixed_field';
   cells: Map<string, GridCell> = new Map();
   roverCoord: Coord = { x: 0, y: 0 };
@@ -158,29 +158,52 @@ export class ClientSimulationEngine {
     this.prevError = 0.0;
 
     if (name === 'mixed_field') {
-      this.setCell(1, 0, 'plant', { moisture: 65, health: 'healthy', confidence: 0.95, inspected: false, watered: false });
-      this.setCell(3, 1, 'plant', { moisture: 70, health: 'healthy', confidence: 0.97, inspected: false, watered: false });
-      this.setCell(5, 3, 'plant', { moisture: 55, health: 'healthy', confidence: 0.92, inspected: false, watered: false });
-      this.setCell(2, 1, 'plant', { moisture: 22, health: 'healthy', confidence: 0.94, inspected: false, watered: false });
-      this.setCell(4, 2, 'plant', { moisture: 58, health: 'suspected_disease', confidence: 0.88, inspected: false, watered: false });
-      this.setCell(2, 3, 'weed');
-      this.setCell(5, 1, 'weed');
-      this.setCell(1, 1, 'obstacle');
-      this.setCell(3, 2, 'obstacle');
+      this.setCell(1, 1, 'plant', { moisture: 65, health: 'healthy', confidence: 0.95, inspected: false, watered: false });
+      this.setCell(1, 4, 'plant', { moisture: 70, health: 'healthy', confidence: 0.97, inspected: false, watered: false });
+      this.setCell(3, 1, 'plant', { moisture: 68, health: 'healthy', confidence: 0.94, inspected: false, watered: false });
+      this.setCell(3, 4, 'plant', { moisture: 62, health: 'healthy', confidence: 0.92, inspected: false, watered: false });
+      this.setCell(5, 1, 'plant', { moisture: 72, health: 'healthy', confidence: 0.96, inspected: false, watered: false });
+      this.setCell(5, 4, 'plant', { moisture: 60, health: 'healthy', confidence: 0.93, inspected: false, watered: false });
+      this.setCell(7, 2, 'plant', { moisture: 55, health: 'healthy', confidence: 0.91, inspected: false, watered: false });
+      this.setCell(7, 5, 'plant', { moisture: 58, health: 'healthy', confidence: 0.92, inspected: false, watered: false });
+
+      this.setCell(2, 2, 'plant', { moisture: 18, health: 'healthy', confidence: 0.95, inspected: false, watered: false });
+      this.setCell(4, 2, 'plant', { moisture: 22, health: 'healthy', confidence: 0.94, inspected: false, watered: false });
+      this.setCell(6, 4, 'plant', { moisture: 15, health: 'healthy', confidence: 0.98, inspected: false, watered: false });
+
+      this.setCell(3, 3, 'plant', { moisture: 58, health: 'suspected_disease', confidence: 0.88, inspected: false, watered: false });
+      this.setCell(5, 2, 'plant', { moisture: 52, health: 'suspected_disease', confidence: 0.91, inspected: false, watered: false });
+
+      this.setCell(2, 4, 'weed');
+      this.setCell(4, 4, 'weed');
+      this.setCell(6, 2, 'weed');
+      this.setCell(7, 1, 'weed');
+
+      this.setCell(2, 1, 'obstacle');
+      this.setCell(4, 3, 'obstacle');
+      this.setCell(6, 3, 'obstacle');
     } else if (name === 'obstacle_challenge') {
-      this.setCell(2, 0, 'obstacle');
-      this.setCell(2, 1, 'obstacle');
-      this.setCell(2, 2, 'obstacle');
-      this.setCell(4, 1, 'plant', { moisture: 18, health: 'healthy', confidence: 0.95, inspected: false, watered: false });
-      this.setCell(5, 2, 'weed');
-      this.setCell(4, 3, 'plant', { moisture: 60, health: 'needs_inspection', confidence: 0.92, inspected: false, watered: false });
+      this.setCell(3, 0, 'obstacle');
+      this.setCell(3, 1, 'obstacle');
+      this.setCell(3, 2, 'obstacle');
+      this.setCell(3, 3, 'obstacle');
+
+      this.setCell(5, 1, 'plant', { moisture: 18, health: 'healthy', confidence: 0.95, inspected: false, watered: false });
+      this.setCell(7, 2, 'plant', { moisture: 20, health: 'healthy', confidence: 0.96, inspected: false, watered: false });
+      this.setCell(6, 3, 'weed');
+      this.setCell(7, 5, 'weed');
+      this.setCell(5, 4, 'plant', { moisture: 62, health: 'needs_inspection', confidence: 0.92, inspected: false, watered: false });
     } else if (name === 'dry_field') {
-      this.setCell(1, 1, 'plant', { moisture: 15, health: 'healthy', confidence: 0.96, inspected: false, watered: false });
-      this.setCell(3, 0, 'plant', { moisture: 20, health: 'healthy', confidence: 0.94, inspected: false, watered: false });
-      this.setCell(4, 2, 'plant', { moisture: 25, health: 'healthy', confidence: 0.95, inspected: false, watered: false });
-      this.setCell(2, 3, 'plant', { moisture: 12, health: 'healthy', confidence: 0.98, inspected: false, watered: false });
-      this.setCell(5, 1, 'plant', { moisture: 75, health: 'healthy', confidence: 0.99, inspected: false, watered: false });
-      this.setCell(2, 1, 'obstacle');
+      this.setCell(1, 2, 'plant', { moisture: 15, health: 'healthy', confidence: 0.96, inspected: false, watered: false });
+      this.setCell(3, 1, 'plant', { moisture: 12, health: 'healthy', confidence: 0.94, inspected: false, watered: false });
+      this.setCell(4, 4, 'plant', { moisture: 20, health: 'healthy', confidence: 0.95, inspected: false, watered: false });
+      this.setCell(5, 2, 'plant', { moisture: 16, health: 'healthy', confidence: 0.97, inspected: false, watered: false });
+      this.setCell(6, 4, 'plant', { moisture: 19, health: 'healthy', confidence: 0.94, inspected: false, watered: false });
+      this.setCell(2, 5, 'plant', { moisture: 25, health: 'healthy', confidence: 0.93, inspected: false, watered: false });
+      this.setCell(7, 3, 'plant', { moisture: 75, health: 'healthy', confidence: 0.99, inspected: false, watered: false });
+
+      this.setCell(2, 2, 'obstacle');
+      this.setCell(5, 3, 'obstacle');
     }
 
     this.scanTasks();

@@ -88,6 +88,15 @@ export interface KinematicsData {
   };
 }
 
+export interface UAVDroneMetadata {
+  source: string;
+  model: string;
+  altitude_m: number;
+  gsd_cm_px: number;
+  map50: number;
+  dataset: string;
+}
+
 export interface CVInspectionData {
   detected: boolean;
   classification: string;
@@ -103,6 +112,7 @@ export interface CVInspectionData {
   aspect_ratio?: number;
   image_base64?: string;
   target_coordinate?: [number, number];
+  uav_drone?: UAVDroneMetadata;
 }
 
 export interface KalmanChannelData {

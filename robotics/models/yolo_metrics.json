@@ -1,0 +1,11 @@
+{
+  "mAP50": 0.004011401797201741,
+  "mAP50-95": 0.0012007963267955384,
+  "classes": [
+    "crop",
+    "weed"
+  ],
+  "model_architecture": "YOLOv8n",
+  "dataset": "LibreYOLO/weed-crop-aerial (Roboflow 100)",
+  "sensor_type": "UAV Aerial Drone RGB Multispectral Camera"
+}

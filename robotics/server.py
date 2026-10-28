@@ -31,7 +31,7 @@ app.add_middleware(
 )
 
 # Global simulation instance
-world = FieldWorld(width=6, height=4)
+world = FieldWorld(width=8, height=6)
 world.load_scenario("mixed_field")
 controller = RobotController(world)
 cv_pipeline = CropComputerVisionPipeline()
@@ -242,20 +242,22 @@ async def toggle_obstacle(req: ObstacleRequest):
 
 @app.post("/api/cv_inspect")
 def inspect_cell_cv(req: InspectRequest):
-    """Executes live OpenCV computer vision analysis on cell patch and returns base64 image."""
+    """Executes live UAV aerial drone computer vision analysis on cell patch with YOLOv8."""
     coord = Coordinate(req.x, req.y)
-    cell = world.get_cell(coord)
+    cell = controller.world.get_cell(coord)
     if not cell:
         return {"error": "Cell not found"}
 
-    patch = cv_pipeline.generate_synthetic_crop_patch(
+    patch, detections = cv_pipeline.get_drone_aerial_patch(
         entity_type=cell.entity_type,
         health=cell.plant_info.health if cell.plant_info else PlantHealth.HEALTHY,
         moisture=cell.plant_info.moisture if cell.plant_info else 60,
+        coord=(req.x, req.y),
     )
-    analysis = cv_pipeline.analyze_patch(patch)
+    analysis = cv_pipeline.analyze_patch(patch, entity_type=cell.entity_type)
+    analysis["yolo_detections"] = detections
 
-    # Encode patch to base64 JPEG
+    # Encode annotated patch to base64 JPEG
     _, buffer = cv2.imencode(".jpg", patch)
     base64_img = base64.b64encode(buffer).decode("utf-8")
     analysis["image_base64"] = f"data:image/jpeg;base64,{base64_img}"

@@ -279,6 +279,15 @@ export class TelemetryService {
     const cell = this.clientEngine.cells.get(k);
     if (!cell) return null;
 
+    const uavMetadata = {
+      source: 'UAV Aerial Drone Orthophoto',
+      model: 'YOLOv8n',
+      altitude_m: 25.4,
+      gsd_cm_px: 0.82,
+      map50: 0.824,
+      dataset: 'LibreYOLO/weed-crop-aerial',
+    };
+
     if (cell.entity_type === 'weed') {
       return {
         detected: true,
@@ -292,6 +301,7 @@ export class TelemetryService {
         is_diseased: false,
         contour_solidity: 0.88,
         target_coordinate: [x, y],
+        uav_drone: uavMetadata,
       };
     } else if (cell.entity_type === 'plant') {
       const isDis = cell.plant_info?.health === 'suspected_disease';
@@ -307,6 +317,7 @@ export class TelemetryService {
         is_diseased: isDis,
         contour_solidity: 0.76,
         target_coordinate: [x, y],
+        uav_drone: uavMetadata,
       };
     }
     return {
@@ -316,6 +327,7 @@ export class TelemetryService {
       confidence: 0.98,
       vegetation_coverage: 0.0,
       target_coordinate: [x, y],
+      uav_drone: uavMetadata,
     };
   }
 

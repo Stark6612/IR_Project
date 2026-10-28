@@ -14,7 +14,7 @@ from .models import (
 class FieldWorld:
     """Represents a 2D discrete crop-field grid."""
 
-    def __init__(self, width: int = 6, height: int = 4):
+    def __init__(self, width: int = 8, height: int = 6):
         self.width = width
         self.height = height
         self.cells: Dict[Coordinate, Cell] = {}
@@ -59,10 +59,10 @@ class FieldWorld:
 
     def load_scenario(self, scenario_name: str) -> None:
         """
-        Loads one of the 3 deterministic scenarios defined in PRD FR-02:
-        1. 'mixed_field': plants, weeds, dry plants, and obstacles.
+        Loads one of the 3 deterministic scenarios scaled to an 8x6 discrete field:
+        1. 'mixed_field': healthy crops, weeds, dry plants, and rock obstacles.
         2. 'obstacle_challenge': route requiring rover to navigate around an obstacle barrier.
-        3. 'dry_field': several plants with low moisture needing prioritized watering.
+        3. 'dry_field': multiple plants with low moisture needing prioritized watering.
         """
         self._initialize_empty_grid()
         self.scenario_name = scenario_name
@@ -70,55 +70,91 @@ class FieldWorld:
         if scenario_name == "mixed_field":
             self.rover_start = Coordinate(0, 0)
 
-            # Healthy plants
-            self.set_cell(Coordinate(1, 0), EntityType.PLANT, PlantInfo(moisture=65, health=PlantHealth.HEALTHY))
-            self.set_cell(Coordinate(3, 1), EntityType.PLANT, PlantInfo(moisture=70, health=PlantHealth.HEALTHY))
-            self.set_cell(Coordinate(5, 3), EntityType.PLANT, PlantInfo(moisture=55, health=PlantHealth.HEALTHY))
+            if self.width == 6 and self.height == 4:
+                # 6x4 Legacy Benchmark
+                self.set_cell(Coordinate(1, 0), EntityType.PLANT, PlantInfo(moisture=65, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(3, 1), EntityType.PLANT, PlantInfo(moisture=70, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(5, 3), EntityType.PLANT, PlantInfo(moisture=55, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(2, 1), EntityType.PLANT, PlantInfo(moisture=22, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(4, 2), EntityType.PLANT, PlantInfo(moisture=58, health=PlantHealth.SUSPECTED_DISEASE, confidence=0.88))
+                self.set_cell(Coordinate(2, 3), EntityType.WEED)
+                self.set_cell(Coordinate(5, 1), EntityType.WEED)
+                self.set_cell(Coordinate(1, 1), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(3, 2), EntityType.OBSTACLE)
+            else:
+                # 8x6 Expanded Field
+                self.set_cell(Coordinate(1, 1), EntityType.PLANT, PlantInfo(moisture=65, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(1, 4), EntityType.PLANT, PlantInfo(moisture=70, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(3, 1), EntityType.PLANT, PlantInfo(moisture=68, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(3, 4), EntityType.PLANT, PlantInfo(moisture=62, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(5, 1), EntityType.PLANT, PlantInfo(moisture=72, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(5, 4), EntityType.PLANT, PlantInfo(moisture=60, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(7, 2), EntityType.PLANT, PlantInfo(moisture=55, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(7, 5), EntityType.PLANT, PlantInfo(moisture=58, health=PlantHealth.HEALTHY))
 
-            # Dry plant needing watering (<30%)
-            self.set_cell(Coordinate(2, 1), EntityType.PLANT, PlantInfo(moisture=22, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(2, 2), EntityType.PLANT, PlantInfo(moisture=18, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(4, 2), EntityType.PLANT, PlantInfo(moisture=22, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(6, 4), EntityType.PLANT, PlantInfo(moisture=15, health=PlantHealth.HEALTHY))
 
-            # Diseased/inspection needed plant
-            self.set_cell(Coordinate(4, 2), EntityType.PLANT, PlantInfo(moisture=58, health=PlantHealth.SUSPECTED_DISEASE, confidence=0.88))
+                self.set_cell(Coordinate(3, 3), EntityType.PLANT, PlantInfo(moisture=58, health=PlantHealth.SUSPECTED_DISEASE, confidence=0.88))
+                self.set_cell(Coordinate(5, 2), EntityType.PLANT, PlantInfo(moisture=52, health=PlantHealth.SUSPECTED_DISEASE, confidence=0.91))
 
-            # Weeds
-            self.set_cell(Coordinate(2, 3), EntityType.WEED)
-            self.set_cell(Coordinate(5, 1), EntityType.WEED)
+                self.set_cell(Coordinate(2, 4), EntityType.WEED)
+                self.set_cell(Coordinate(4, 4), EntityType.WEED)
+                self.set_cell(Coordinate(6, 2), EntityType.WEED)
+                self.set_cell(Coordinate(7, 1), EntityType.WEED)
 
-            # Obstacles
-            self.set_cell(Coordinate(1, 1), EntityType.OBSTACLE)
-            self.set_cell(Coordinate(3, 2), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(2, 1), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(4, 3), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(6, 3), EntityType.OBSTACLE)
 
         elif scenario_name == "obstacle_challenge":
             self.rover_start = Coordinate(0, 0)
 
-            # Creates a vertical barrier at x=2 with an opening at y=3
-            self.set_cell(Coordinate(2, 0), EntityType.OBSTACLE)
-            self.set_cell(Coordinate(2, 1), EntityType.OBSTACLE)
-            self.set_cell(Coordinate(2, 2), EntityType.OBSTACLE)
-            # Opening at (2, 3)
+            if self.width == 6 and self.height == 4:
+                # 6x4 Legacy Benchmark
+                self.set_cell(Coordinate(2, 0), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(2, 1), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(2, 2), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(4, 1), EntityType.PLANT, PlantInfo(moisture=18, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(5, 2), EntityType.WEED)
+                self.set_cell(Coordinate(4, 3), EntityType.PLANT, PlantInfo(moisture=60, health=PlantHealth.NEEDS_INSPECTION, confidence=0.92))
+            else:
+                # 8x6 Expanded Field
+                self.set_cell(Coordinate(3, 0), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(3, 1), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(3, 2), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(3, 3), EntityType.OBSTACLE)
 
-            # High priority dry plant behind the barrier
-            self.set_cell(Coordinate(4, 1), EntityType.PLANT, PlantInfo(moisture=18, health=PlantHealth.HEALTHY))
-            # Weed to clear
-            self.set_cell(Coordinate(5, 2), EntityType.WEED)
-            # Inspection target
-            self.set_cell(Coordinate(4, 3), EntityType.PLANT, PlantInfo(moisture=60, health=PlantHealth.NEEDS_INSPECTION, confidence=0.92))
+                self.set_cell(Coordinate(5, 1), EntityType.PLANT, PlantInfo(moisture=18, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(7, 2), EntityType.PLANT, PlantInfo(moisture=20, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(6, 3), EntityType.WEED)
+                self.set_cell(Coordinate(7, 5), EntityType.WEED)
+                self.set_cell(Coordinate(5, 4), EntityType.PLANT, PlantInfo(moisture=62, health=PlantHealth.NEEDS_INSPECTION, confidence=0.92))
 
         elif scenario_name == "dry_field":
             self.rover_start = Coordinate(0, 0)
 
-            # Multiple dry plants requiring immediate watering
-            self.set_cell(Coordinate(1, 1), EntityType.PLANT, PlantInfo(moisture=15, health=PlantHealth.HEALTHY))
-            self.set_cell(Coordinate(3, 0), EntityType.PLANT, PlantInfo(moisture=20, health=PlantHealth.HEALTHY))
-            self.set_cell(Coordinate(4, 2), EntityType.PLANT, PlantInfo(moisture=25, health=PlantHealth.HEALTHY))
-            self.set_cell(Coordinate(2, 3), EntityType.PLANT, PlantInfo(moisture=12, health=PlantHealth.HEALTHY))
+            if self.width == 6 and self.height == 4:
+                # 6x4 Legacy Benchmark
+                self.set_cell(Coordinate(1, 1), EntityType.PLANT, PlantInfo(moisture=15, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(3, 0), EntityType.PLANT, PlantInfo(moisture=20, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(4, 2), EntityType.PLANT, PlantInfo(moisture=25, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(2, 3), EntityType.PLANT, PlantInfo(moisture=12, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(5, 1), EntityType.PLANT, PlantInfo(moisture=75, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(2, 1), EntityType.OBSTACLE)
+            else:
+                # 8x6 Expanded Field
+                self.set_cell(Coordinate(1, 2), EntityType.PLANT, PlantInfo(moisture=15, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(3, 1), EntityType.PLANT, PlantInfo(moisture=12, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(4, 4), EntityType.PLANT, PlantInfo(moisture=20, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(5, 2), EntityType.PLANT, PlantInfo(moisture=16, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(6, 4), EntityType.PLANT, PlantInfo(moisture=19, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(2, 5), EntityType.PLANT, PlantInfo(moisture=25, health=PlantHealth.HEALTHY))
+                self.set_cell(Coordinate(7, 3), EntityType.PLANT, PlantInfo(moisture=75, health=PlantHealth.HEALTHY))
 
-            # One healthy plant for comparison
-            self.set_cell(Coordinate(5, 1), EntityType.PLANT, PlantInfo(moisture=75, health=PlantHealth.HEALTHY))
-
-            # One obstacle
-            self.set_cell(Coordinate(2, 1), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(2, 2), EntityType.OBSTACLE)
+                self.set_cell(Coordinate(5, 3), EntityType.OBSTACLE)
 
         else:
             raise ValueError(f"Unknown scenario name: '{scenario_name}'. Valid: 'mixed_field', 'obstacle_challenge', 'dry_field'")

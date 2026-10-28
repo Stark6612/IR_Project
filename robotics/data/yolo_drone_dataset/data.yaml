@@ -1,0 +1,9 @@
+path: D:/IR Project/robotics/data/yolo_drone_dataset
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 2
+names:
+  0: crop
+  1: weed
