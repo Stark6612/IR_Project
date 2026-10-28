@@ -9,6 +9,7 @@ import asyncio
 import base64
 import json
 import cv2
+import numpy as np
 from typing import Set, Dict, Any, Optional
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -64,6 +65,10 @@ class NoiseRequest(BaseModel):
 class InspectRequest(BaseModel):
     x: int
     y: int
+
+
+class UploadInspectRequest(BaseModel):
+    image_base64: str
 
 
 async def broadcast_state():
@@ -166,6 +171,15 @@ async def reset_mission(req: ScenarioRequest):
     return {"status": "reset", "scenario": req.scenario}
 
 
+@app.post("/api/randomize")
+async def randomize_mission():
+    global simulation_running
+    controller.reset("randomized")
+    simulation_running = False
+    await broadcast_state()
+    return {"status": "randomized", "scenario": "randomized"}
+
+
 @app.post("/api/step")
 async def single_step():
     global simulation_running
@@ -264,6 +278,23 @@ def inspect_cell_cv(req: InspectRequest):
     analysis["target_coordinate"] = (req.x, req.y)
 
     return analysis
+
+
+@app.post("/api/cv_inspect_upload")
+def inspect_uploaded_image_endpoint(req: UploadInspectRequest):
+    """Executes live UAV aerial drone YOLOv8 and OpenCV analysis on an uploaded image."""
+    try:
+        raw_b64 = req.image_base64
+        if "," in raw_b64:
+            raw_b64 = raw_b64.split(",", 1)[1]
+        img_bytes = base64.b64decode(raw_b64)
+        np_arr = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        if img is None:
+            return {"error": "Invalid image format"}
+        return cv_pipeline.inspect_uploaded_image(img)
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @app.websocket("/ws")

@@ -204,6 +204,36 @@ export class ClientSimulationEngine {
 
       this.setCell(2, 2, 'obstacle');
       this.setCell(5, 3, 'obstacle');
+    } else if (name === 'randomized') {
+      const allCoords: [number, number][] = [];
+      for (let x = 0; x < this.width; x++) {
+        for (let y = 0; y < this.height; y++) {
+          if (!(x === 0 && y === 0)) allCoords.push([x, y]);
+        }
+      }
+      allCoords.sort(() => Math.random() - 0.5);
+
+      const numPlants = Math.floor(allCoords.length * 0.28);
+      const numWeeds = Math.floor(allCoords.length * 0.12);
+      const numObstacles = Math.floor(allCoords.length * 0.12);
+
+      let idx = 0;
+      for (let i = 0; i < numPlants; i++, idx++) {
+        const [x, y] = allCoords[idx];
+        const isDry = Math.random() < 0.45;
+        const isDiseased = !isDry && Math.random() < 0.35;
+        const moisture = isDry ? Math.floor(Math.random() * 15) + 14 : Math.floor(Math.random() * 30) + 55;
+        const health = isDiseased ? 'suspected_disease' : 'healthy';
+        this.setCell(x, y, 'plant', { moisture, health, confidence: 0.95, inspected: false, watered: false });
+      }
+      for (let i = 0; i < numWeeds; i++, idx++) {
+        const [x, y] = allCoords[idx];
+        this.setCell(x, y, 'weed');
+      }
+      for (let i = 0; i < numObstacles; i++, idx++) {
+        const [x, y] = allCoords[idx];
+        this.setCell(x, y, 'obstacle');
+      }
     }
 
     this.scanTasks();

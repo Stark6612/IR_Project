@@ -45,6 +45,10 @@ export const App: React.FC = () => {
     telemetryService.resetMission(scenario);
   };
 
+  const handleRandomize = () => {
+    telemetryService.randomizeMission();
+  };
+
   const handleSpeedChange = (newSpeed: number) => {
     setSpeed(newSpeed);
     telemetryService.setSpeed(newSpeed);
@@ -99,6 +103,7 @@ export const App: React.FC = () => {
         state={telemetry.rover.state}
         scenario={telemetry.world.scenario}
         onScenarioChange={handleScenarioChange}
+        onRandomize={handleRandomize}
         onExportJson={handleExportJson}
         onExportCsv={handleExportCsv}
       />

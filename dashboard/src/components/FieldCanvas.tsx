@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { GridCell, HeadingDirection } from '../types/telemetry';
-import { Droplets, AlertTriangle, Sparkles } from 'lucide-react';
+import { Droplets, Sparkles } from 'lucide-react';
 
 interface FieldCanvasProps {
   width: number;
@@ -400,94 +400,136 @@ export const FieldCanvas: React.FC<FieldCanvasProps> = ({
                       />
                     </div>
                   ) : cell.entity_type === 'plant' ? (
-                    // Plant Cell
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                    // Real Photographic Crop Cell
+                    <div style={{ position: 'relative', width: '86%', height: '86%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                       <div
                         style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          background:
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          border:
                             cell.plant_info?.health === 'suspected_disease'
-                              ? 'radial-gradient(circle, #facc15 30%, #15803d 80%)'
+                              ? '2px solid #eab308'
                               : cell.plant_info && cell.plant_info.moisture < 30
-                              ? 'radial-gradient(circle, #f97316 40%, #166534 85%)'
-                              : 'radial-gradient(circle, #4ade80 30%, #166534 80%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+                              ? '2px solid #f97316'
+                              : '2px solid #22c55e',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                          position: 'relative',
                         }}
                       >
-                        <span style={{ fontSize: '1.1rem' }}>🌱</span>
+                        <img
+                          src={
+                            cell.plant_info?.health === 'suspected_disease'
+                              ? '/tiles/crop_diseased.jpg'
+                              : cell.plant_info && cell.plant_info.moisture < 30
+                              ? '/tiles/crop_dry.jpg'
+                              : ((x * 7 + y * 3) % 3 === 0)
+                              ? '/tiles/crop_var_1.jpg'
+                              : ((x * 7 + y * 3) % 3 === 1)
+                              ? '/tiles/crop_var_2.jpg'
+                              : '/tiles/crop_healthy.jpg'
+                          }
+                          alt="Crop"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
                       </div>
                       {/* Moisture Badge */}
                       {cell.plant_info && (
                         <div
                           style={{
+                            position: 'absolute',
+                            bottom: '-4px',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '2px',
-                            fontSize: '0.65rem',
+                            fontSize: '0.62rem',
                             fontWeight: 700,
                             fontFamily: 'var(--font-mono)',
                             color: cell.plant_info.moisture < 30 ? '#f59e0b' : '#34d399',
-                            background: 'rgba(0,0,0,0.6)',
+                            background: 'rgba(0,0,0,0.78)',
                             padding: '1px 5px',
                             borderRadius: '4px',
+                            border: '1px solid rgba(255,255,255,0.12)',
+                            zIndex: 5,
                           }}
                         >
-                          <Droplets size={9} />
+                          <Droplets size={8} />
                           <span>{cell.plant_info.moisture}%</span>
                         </div>
                       )}
                     </div>
                   ) : cell.entity_type === 'weed' ? (
-                    // Invasive Weed Cell
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    // Real Photographic Weed Cell
+                    <div style={{ position: 'relative', width: '86%', height: '86%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                       <div
                         style={{
-                          width: '34px',
-                          height: '34px',
+                          width: '100%',
+                          height: '100%',
                           borderRadius: '8px',
-                          background: 'linear-gradient(135deg, #7e22ce 0%, #15803d 100%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 0 10px rgba(168, 85, 247, 0.4)',
+                          overflow: 'hidden',
+                          border: '2px solid #a855f7',
+                          boxShadow: '0 0 10px rgba(168, 85, 247, 0.45)',
                         }}
                       >
-                        <span style={{ fontSize: '1.15rem' }}>🌿</span>
+                        <img
+                          src={((x * 5 + y * 2) % 2 === 0) ? '/tiles/weed_var_1.jpg' : '/tiles/weed.jpg'}
+                          alt="Weed"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
                       </div>
-                      <span style={{ fontSize: '0.62rem', color: '#c084fc', fontWeight: 600 }}>Weed</span>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: '-4px',
+                          background: 'rgba(126, 34, 206, 0.9)',
+                          color: '#f3e8ff',
+                          fontSize: '0.55rem',
+                          fontWeight: 700,
+                          fontFamily: 'var(--font-mono)',
+                          padding: '1px 4px',
+                          borderRadius: '3px',
+                          zIndex: 5,
+                        }}
+                      >
+                        WEED
+                      </div>
                     </div>
                   ) : cell.entity_type === 'obstacle' ? (
-                    // Obstacle Rock Cell
+                    // Real Photographic Obstacle Rock Cell
                     <div
                       style={{
-                        width: '38px',
-                        height: '38px',
-                        borderRadius: '6px',
-                        background: 'linear-gradient(135deg, #475569 0%, #0f172a 100%)',
-                        border: '1px solid #94a3b8',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        width: '86%',
+                        height: '86%',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        border: '2px solid #94a3b8',
                         boxShadow: '0 4px 10px rgba(0,0,0,0.6)',
                       }}
                     >
-                      <AlertTriangle size={18} color="#e2e8f0" />
+                      <img
+                        src="/tiles/obstacle.jpg"
+                        alt="Rock Obstacle"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                     </div>
                   ) : (
-                    // Empty Soil Cell
+                    // Empty Soil Cell with Real Soil Texture
                     <div
                       style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        background: 'rgba(255, 255, 255, 0.08)',
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                        opacity: 0.6,
                       }}
-                    />
+                    >
+                      <img
+                        src="/tiles/soil.jpg"
+                        alt="Soil"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
                   )}
                 </div>
               );

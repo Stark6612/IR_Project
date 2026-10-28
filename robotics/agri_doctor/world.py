@@ -156,8 +156,48 @@ class FieldWorld:
                 self.set_cell(Coordinate(2, 2), EntityType.OBSTACLE)
                 self.set_cell(Coordinate(5, 3), EntityType.OBSTACLE)
 
+        elif scenario_name == "randomized":
+            self.randomize()
+
         else:
-            raise ValueError(f"Unknown scenario name: '{scenario_name}'. Valid: 'mixed_field', 'obstacle_challenge', 'dry_field'")
+            raise ValueError(f"Unknown scenario name: '{scenario_name}'. Valid: 'mixed_field', 'obstacle_challenge', 'dry_field', 'randomized'")
+
+    def randomize(self, plant_ratio: float = 0.28, weed_ratio: float = 0.12, obstacle_ratio: float = 0.12) -> None:
+        """Randomizes grid cell entities and plant conditions across the field."""
+        import random
+        self.scenario_name = "randomized"
+        self._initialize_empty_grid()
+        self.rover_start = Coordinate(0, 0)
+
+        all_coords = [Coordinate(x, y) for x in range(self.width) for y in range(self.height) if not (x == 0 and y == 0)]
+        random.shuffle(all_coords)
+
+        num_cells = len(all_coords)
+        num_plants = max(4, int(num_cells * plant_ratio))
+        num_weeds = max(2, int(num_cells * weed_ratio))
+        num_obstacles = max(2, int(num_cells * obstacle_ratio))
+
+        plant_coords = all_coords[:num_plants]
+        weed_coords = all_coords[num_plants:num_plants + num_weeds]
+        obstacle_coords = all_coords[num_plants + num_weeds:num_plants + num_weeds + num_obstacles]
+
+        for coord in plant_coords:
+            moisture = random.randint(14, 82)
+            health = random.choice([
+                PlantHealth.HEALTHY,
+                PlantHealth.HEALTHY,
+                PlantHealth.HEALTHY,
+                PlantHealth.NEEDS_INSPECTION,
+                PlantHealth.SUSPECTED_DISEASE,
+            ])
+            confidence = round(random.uniform(0.89, 0.98), 2)
+            self.set_cell(coord, EntityType.PLANT, PlantInfo(moisture=moisture, health=health, confidence=confidence))
+
+        for coord in weed_coords:
+            self.set_cell(coord, EntityType.WEED)
+
+        for coord in obstacle_coords:
+            self.set_cell(coord, EntityType.OBSTACLE)
 
     def to_dict(self) -> Dict:
         """Serializes current world grid for UI dashboard consumption."""

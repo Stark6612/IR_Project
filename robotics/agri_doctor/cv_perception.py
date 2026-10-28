@@ -9,6 +9,7 @@ Directly satisfies Course 24AI2003 Rubrics:
 from __future__ import annotations
 import cv2
 import json
+import base64
 import numpy as np
 from pathlib import Path
 from typing import Dict, Any, Tuple, Optional, List
@@ -329,3 +330,56 @@ class CropComputerVisionPipeline:
                 "dataset": self.yolo_metrics.get("dataset", "LibreYOLO/weed-crop-aerial"),
             },
         }
+
+    def inspect_uploaded_image(self, bgr_image: np.ndarray) -> Dict[str, Any]:
+        """
+        Runs complete YOLOv8 object detection and OpenCV plant health analysis
+        on an arbitrary user-uploaded image.
+        """
+        h, w = bgr_image.shape[:2]
+        if max(h, w) > 1024:
+            scale = 1024 / max(h, w)
+            bgr_image = cv2.resize(bgr_image, (int(w * scale), int(h * scale)))
+            h, w = bgr_image.shape[:2]
+
+        annotated = bgr_image.copy()
+        detections = []
+
+        # Run live YOLOv8 model inference if loaded
+        if self.yolo_model:
+            try:
+                results = self.yolo_model.predict(source=annotated, conf=0.25, verbose=False)
+                if results and len(results) > 0:
+                    r = results[0]
+                    for box in r.boxes:
+                        cls_id = int(box.cls[0].item())
+                        cls_name = r.names.get(cls_id, f"class_{cls_id}")
+                        conf = float(box.conf[0].item())
+                        xyxy = [int(v) for v in box.xyxy[0].tolist()]
+                        detections.append({
+                            "class": cls_name,
+                            "confidence": round(conf, 3),
+                            "bbox": xyxy,
+                        })
+                        color = (35, 215, 80) if "crop" in cls_name.lower() else (200, 70, 220)
+                        cv2.rectangle(annotated, (xyxy[0], xyxy[1]), (xyxy[2], xyxy[3]), color, 2)
+                        label = f"{cls_name} {conf*100:.1f}%"
+                        cv2.rectangle(annotated, (xyxy[0], xyxy[1] - 18), (xyxy[0] + len(label) * 8 + 8, xyxy[1]), color, -1)
+                        cv2.putText(annotated, label, (xyxy[0] + 4, xyxy[1] - 4), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
+            except Exception:
+                pass
+
+        # Also run OpenCV ExG, HSV, and Chlorosis analysis on the image
+        analysis = self.analyze_patch(bgr_image)
+        if detections:
+            analysis["detected"] = True
+            primary = max(detections, key=lambda d: d["confidence"])
+            analysis["classification"] = primary["class"]
+            analysis["confidence"] = primary["confidence"]
+        analysis["yolo_detections"] = detections
+
+        # Encode annotated image to base64 JPEG
+        _, buffer = cv2.imencode(".jpg", annotated)
+        base64_img = base64.b64encode(buffer).decode("utf-8")
+        analysis["image_base64"] = f"data:image/jpeg;base64,{base64_img}"
+        return analysis

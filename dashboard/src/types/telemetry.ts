@@ -97,6 +97,12 @@ export interface UAVDroneMetadata {
   dataset: string;
 }
 
+export interface YoloDetection {
+  class: string;
+  confidence: number;
+  bbox: [number, number, number, number];
+}
+
 export interface CVInspectionData {
   detected: boolean;
   classification: string;
@@ -113,6 +119,7 @@ export interface CVInspectionData {
   image_base64?: string;
   target_coordinate?: [number, number];
   uav_drone?: UAVDroneMetadata;
+  yolo_detections?: YoloDetection[];
 }
 
 export interface KalmanChannelData {

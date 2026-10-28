@@ -9,6 +9,7 @@ import {
   Layers,
   Server,
   Cpu,
+  Shuffle,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -17,6 +18,7 @@ interface HeaderProps {
   state: RobotState;
   scenario: string;
   onScenarioChange: (scenario: string) => void;
+  onRandomize?: () => void;
   onExportJson: () => void;
   onExportCsv: () => void;
 }
@@ -27,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   state,
   scenario,
   onScenarioChange,
+  onRandomize,
   onExportJson,
   onExportCsv,
 }) => {
@@ -108,7 +111,31 @@ export const Header: React.FC<HeaderProps> = ({
               <option value="mixed_field">Scenario 1: Mixed Field</option>
               <option value="obstacle_challenge">Scenario 2: Obstacle Challenge</option>
               <option value="dry_field">Scenario 3: Dry Field</option>
+              <option value="randomized">🎲 Scenario: Randomized</option>
             </select>
+            {onRandomize && (
+              <button
+                onClick={onRandomize}
+                title="Randomize grid cells with different real crops, weeds, and obstacles"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%)',
+                  border: '1px solid rgba(168, 85, 247, 0.4)',
+                  color: '#e9d5ff',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <Shuffle size={13} color="#c084fc" />
+                <span>Randomize Grid</span>
+              </button>
+            )}
           </div>
 
           {/* Mission State Indicator */}
