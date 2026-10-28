@@ -96,13 +96,13 @@ IR Project/
 ```powershell
 .\scripts\run-all.ps1
 ```
-* Launches the Python FastAPI backend on `http://127.0.0.1:8000`
-* Launches the Vite React dashboard on `http://localhost:5173`
+* Launches the Python FastAPI backend on `http://127.0.0.1:5000`
+* Launches the Vite React dashboard on `http://localhost:3000`
 
 ### 2. Manual Startup
 **Backend:**
 ```bash
-python -m uvicorn server:app --host 127.0.0.1 --port 8000 --app-dir robotics
+python -m uvicorn server:app --host 127.0.0.1 --port 5000 --app-dir robotics
 ```
 
 **Frontend:**

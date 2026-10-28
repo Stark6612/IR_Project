@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { SimulationTelemetry } from '../types/telemetry';
+import { BACKEND_URL } from '../services/telemetryService';
 
 interface KalmanFilterHUDProps {
   telemetry: SimulationTelemetry | null;
@@ -55,7 +56,7 @@ export const KalmanFilterHUD: React.FC<KalmanFilterHUDProps> = ({ telemetry }) =
   const handleNoiseChange = async (newSigma: number) => {
     setNoiseSigma(newSigma);
     try {
-      await fetch('http://127.0.0.1:8000/api/noise', {
+      await fetch(`${BACKEND_URL}/api/noise`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -73,7 +74,7 @@ export const KalmanFilterHUD: React.FC<KalmanFilterHUDProps> = ({ telemetry }) =
     const nextState = !isNoiseEnabled;
     setIsNoiseEnabled(nextState);
     try {
-      await fetch('http://127.0.0.1:8000/api/noise', {
+      await fetch(`${BACKEND_URL}/api/noise`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

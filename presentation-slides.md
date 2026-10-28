@@ -156,4 +156,4 @@
 **Open for Examiner & Faculty Evaluation**
 
 - **GitHub Repository:** [github.com/Stark6612/IR_Project](https://github.com/Stark6612/IR_Project.git)
-- **Live Demo Dashboard:** `http://localhost:5173/`
+- **Live Demo Dashboard:** `http://localhost:3000/`

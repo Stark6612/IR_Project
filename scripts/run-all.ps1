@@ -8,8 +8,8 @@ Write-Host "==========================================================" -Foregro
 $CurrentDir = Get-Location
 $env:PYTHONPATH = "$CurrentDir\robotics"
 
-Write-Host "[1/2] Starting Python FastAPI & WebSocket Telemetry Server..." -ForegroundColor Cyan
-$ServerJob = Start-Process python -ArgumentList "-m uvicorn server:app --host 127.0.0.1 --port 8000 --app-dir robotics" -PassThru -NoNewWindow
+Write-Host "[1/2] Starting Python FastAPI & WebSocket Telemetry Server (Port 5000)..." -ForegroundColor Cyan
+$ServerJob = Start-Process python -ArgumentList "-m uvicorn server:app --host 127.0.0.1 --port 5000 --app-dir robotics" -PassThru -NoNewWindow
 
 Start-Sleep -Seconds 2
 

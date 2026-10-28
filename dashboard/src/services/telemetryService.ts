@@ -7,6 +7,10 @@
 import type { SimulationTelemetry, CVInspectionData } from '../types/telemetry';
 import { ClientSimulationEngine } from './clientSimulationEngine';
 
+export const BACKEND_PORT = 5000;
+export const BACKEND_URL = `http://localhost:${BACKEND_PORT}`;
+export const BACKEND_WS_URL = `ws://localhost:${BACKEND_PORT}/ws`;
+
 export type EngineMode = 'python_server' | 'standalone_client';
 
 export class TelemetryService {
@@ -69,7 +73,7 @@ export class TelemetryService {
 
   private async attemptServerConnection() {
     try {
-      const res = await fetch('http://localhost:8000/api/state', { method: 'GET' });
+      const res = await fetch(`${BACKEND_URL}/api/state`, { method: 'GET' });
       if (res.ok) {
         this.isServerOnline = true;
         this.mode = 'python_server';
@@ -95,7 +99,7 @@ export class TelemetryService {
     }
 
     try {
-      this.ws = new WebSocket('ws://localhost:8000/ws');
+      this.ws = new WebSocket(BACKEND_WS_URL);
       this.ws.onopen = () => {
         this.isServerOnline = true;
         this.mode = 'python_server';
@@ -133,7 +137,7 @@ export class TelemetryService {
   public async startMission() {
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        await fetch('http://localhost:8000/api/start', { method: 'POST' });
+        await fetch(`${BACKEND_URL}/api/start`, { method: 'POST' });
         return;
       } catch {}
     }
@@ -153,7 +157,7 @@ export class TelemetryService {
   public async pauseMission() {
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        await fetch('http://localhost:8000/api/pause', { method: 'POST' });
+        await fetch(`${BACKEND_URL}/api/pause`, { method: 'POST' });
         return;
       } catch {}
     }
@@ -167,7 +171,7 @@ export class TelemetryService {
   public async resumeMission() {
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        await fetch('http://localhost:8000/api/resume', { method: 'POST' });
+        await fetch(`${BACKEND_URL}/api/resume`, { method: 'POST' });
         return;
       } catch {}
     }
@@ -183,7 +187,7 @@ export class TelemetryService {
   public async stopMission() {
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        await fetch('http://localhost:8000/api/stop', { method: 'POST' });
+        await fetch(`${BACKEND_URL}/api/stop`, { method: 'POST' });
         return;
       } catch {}
     }
@@ -198,7 +202,7 @@ export class TelemetryService {
   public async resetMission(scenario: string) {
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        await fetch('http://localhost:8000/api/reset', {
+        await fetch(`${BACKEND_URL}/api/reset`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ scenario }),
@@ -215,7 +219,7 @@ export class TelemetryService {
   public async stepMission() {
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        const res = await fetch('http://localhost:8000/api/step', { method: 'POST' });
+        const res = await fetch(`${BACKEND_URL}/api/step`, { method: 'POST' });
         const data = await res.json();
         this.notify(data);
         return;
@@ -230,7 +234,7 @@ export class TelemetryService {
   public async toggleObstacle(x: number, y: number) {
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        await fetch('http://localhost:8000/api/obstacle', {
+        await fetch(`${BACKEND_URL}/api/obstacle`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ x, y }),
@@ -247,7 +251,7 @@ export class TelemetryService {
     this.speed = multiplier;
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        await fetch('http://localhost:8000/api/speed', {
+        await fetch(`${BACKEND_URL}/api/speed`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ speed: multiplier }),
@@ -263,7 +267,7 @@ export class TelemetryService {
   public async inspectCellCV(x: number, y: number): Promise<CVInspectionData | null> {
     if (this.mode === 'python_server' && this.isServerOnline) {
       try {
-        const res = await fetch('http://localhost:8000/api/cv_inspect', {
+        const res = await fetch(`${BACKEND_URL}/api/cv_inspect`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ x, y }),
